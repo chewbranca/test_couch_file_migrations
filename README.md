@@ -13,12 +13,15 @@ of CouchDB. Each database has the following five documents
 
 Release 1.4.0 and up built with:
 
+```
 git checkout 1.4.0 && git clean -fqdx && erln8 --use=r16b03-1 && ./bootstrap && ./configure --with-erlang=/Users/russell/.erln8.d/otps/r16b03-1//dist/lib/erlang/erts-5.10.4/include/ && make dev && ./utils/run -i
+```
 
 Release 1.3.1 and below built with:
 
+```
 git checkout 1.3.1 && git clean -fqdx && erln8 --use=r14b01 && ./bootstrap && ./configure --with-erlang=/Users/russell/.erln8.d/otps/r14b01/dist/lib/erlang/erts-5.8.2/include/ && make dev && ./utils/run -i
-
+```
 
 # 1.0.4 and below
 
@@ -52,7 +55,9 @@ $ curl http://localhost:5984/build_full_couch_file_1__6__0__build__fauxton__233_
 {"_id":"small_num_revs_doc","_rev":"10-327187f3c8c237933d2962cbe00bc87b","data":"with revs and num revs < revs_limit"}
 
 $ curl http://localhost:15986/build_full_couch_file_1__6__0__build__fauxton__233__g23490c1/small_num_revs_doc
-{"_id":"small_num_revs_doc","_rev":"10-327187f3c8c237933d2962cbe00bc87b","data":"with revs and num revs < revs_limit"}
+{"_id":"small_num_revs_doc","_rev":"10-327187f3c8c237933d2962cbe00bc87b","data":"with
+revs and num revs < revs_limit"}
+```
 
 # Running the tests
 
