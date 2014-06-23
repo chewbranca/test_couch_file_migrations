@@ -375,15 +375,15 @@ def db_meta_assertions(db):
 
 
 def build_full_couch_file(copy=True):
+    disable_delayed_commits()
+
     version = get_version(couch_host)
     dbname = "{0}_{1}".format(gen_test_db(), version)
     couch_db = "{0}/{1}".format(couch_host, dbname)
     create_db(couch_db)
 
-
     # add a security doc
     add_sec_doc(couch_db)
-
 
     # create sample simple doc
     doc = {
