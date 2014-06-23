@@ -321,6 +321,11 @@ def full_couch_file_assertions(db):
     assert(resp == {"error":"not_found","reason":"deleted"})
     passed_test("[{}] deleted doc test".format(dbname))
 
+    # purged doc test
+    _status, resp = http('get', db + "/purged_doc", assertion=404)
+    assert(resp == {"error":"not_found","reason":"missing"})
+    passed_test("[{}] purged doc test".format(dbname))
+
     # external attachments doc test
     _status, resp = http('get', db + "/external_attachments_doc", assertion=200)
     _status, resp2 = http('get', db + "/external_attachments_doc/the_attachment.gif", assertion=200)
@@ -362,11 +367,11 @@ def full_couch_file_assertions(db):
 
 def db_meta_assertions(db):
     _s, resp = http('get', db, assertion=200)
-    assert(resp['update_seq'] == 1251)
+    assert(resp['update_seq'] == 1253)
     assert(resp['doc_count'] == 5)
     assert(resp['doc_del_count'] == 1)
     assert(resp['disk_format_version'] == 6)
-    assert(resp['purge_seq'] == 0)
+    assert(resp['purge_seq'] == 1)
 
 
 def build_full_couch_file(copy=True):
@@ -396,6 +401,22 @@ def build_full_couch_file(copy=True):
     doc["_rev"] = resp["rev"]
     doc["_deleted"] = True
     _s, resp = http('put', couch_db + "/" + doc["_id"], data=doc, assertion=200)
+
+    # create sample purged doc
+    doc = {
+        "_id": "purged_doc",
+        "data": "purged"
+    }
+    _s, resp = http('put', couch_db + "/" + doc["_id"], data=doc, assertion=201)
+    rev = resp["rev"]
+    to_purge = {
+        doc["_id"] : [
+            rev
+        ]
+    }
+    _s, resp = http('post', couch_db + "/_purge", data=to_purge, assertion=200)
+    assert(resp["purged"] == to_purge)
+    assert(resp["purge_seq"] == 1)
 
     # create sample doc with external attachments
     doc = {
