@@ -31,6 +31,17 @@ src_dir = "/Users/russell/src"
 couch_db_path = src_dir + "/couchdb/tmp/lib"
 test_couch_files_path = src_dir + "/test_couch_file_migrations_tmp"
 
+sec_doc = {
+  "admins" : {
+     "names" : ["joe", "phil"],
+     "roles" : ["boss"]
+   },
+   "members" : {
+     "names" : ["dave"],
+     "roles" : ["producer", "consumer"]
+   }
+}
+
 
 def disable_delayed_commits():
     http('put', couch_host + "/_config/couchdb/delayed_commits", raw_data='"false"', headers={}, assertion=200)
@@ -55,6 +66,15 @@ def node_shard_path(dbname, i=1):
 def get_version(host):
     status, resp = http('get', host, assertion=200)
     return re.sub(r"[^0-9a-zA-Z]", "__", resp["version"])
+
+
+def add_sec_doc(dbname):
+    return http('put', dbname + "/_security", assertion=200, data=sec_doc)
+
+
+def get_sec_doc(dbname):
+    _s, resp = http('get', dbname + "/_security", assertion=200)
+    return resp
 
 
 def http(method, url, data=None, auth=None, headers=None, assertion=None, files=None, raw_data=None):
@@ -285,6 +305,9 @@ def test_couch_file_migrations():
 def full_couch_file_assertions(db):
     dbname = os.path.basename(db)
 
+    # security doc test
+    assert(get_sec_doc(db) == sec_doc)
+
     # simple doc test
     _status, resp = http('get', db + "/simple_doc", assertion=200)
     rev_num = doc_rev_num(resp)
@@ -326,11 +349,16 @@ def full_couch_file_assertions(db):
     passed_test("[{}] large num revs doc test".format(dbname))
 
 
-def build_full_couch_file():
+def build_full_couch_file(copy=True):
     version = get_version(couch_host)
     dbname = "{0}_{1}".format(gen_test_db(), version)
     couch_db = "{0}/{1}".format(couch_host, dbname)
     create_db(couch_db)
+
+
+    # add a security doc
+    add_sec_doc(couch_db)
+
 
     # create sample simple doc
     doc = {
@@ -400,9 +428,12 @@ def build_full_couch_file():
     assert(len(resp["_revs_info"]) == 1000)
     assert(len(resp["_revs_info"]) < final_rev)
 
-    host_file, _single_node_file, _clustered_files = get_db_paths(dbname)
-    dest_file = "{0}/{1}.couch".format(test_couch_files_path, dbname)
-    copy_file(host_file, dest_file)
+    if copy is True:
+        host_file, _single_node_file, _clustered_files = get_db_paths(dbname)
+        dest_file = "{0}/{1}.couch".format(test_couch_files_path, dbname)
+        copy_file(host_file, dest_file)
+
+    return couch_db
 
 
 
