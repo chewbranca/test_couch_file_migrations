@@ -9,6 +9,11 @@ of CouchDB. Each database has the following five documents
   4. Doc with 1 < num revs < revs_limit
   5. Doc with num revs > revs_limit
 
+The database should also include one deleted document, and it should
+_not_ include the test purged doc.
+
+There is a security doc stored in the database that is tested as well.
+
 # Build info
 
 Release 1.4.0 and up built with:
