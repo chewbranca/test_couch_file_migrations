@@ -32,6 +32,10 @@ couch_db_path = src_dir + "/couchdb/tmp/lib"
 test_couch_files_path = src_dir + "/test_couch_file_migrations_tmp"
 
 
+def disable_delayed_commits():
+    http('put', couch_host + "/_config/couchdb/delayed_commits", raw_data='"false"', headers={}, assertion=200)
+
+
 def node_db_path(i=1):
     return "{0}/bigcouch/dev/lib/node{1}/data".format(src_dir, i)
 
@@ -408,6 +412,8 @@ def run_test(name, test):
 
 
 def main(test=None):
+    disable_delayed_commits()
+
     print "Running tests({})".format(test)
     if test is None:
         attrs = inspect.getmembers(sys.modules[__name__])
