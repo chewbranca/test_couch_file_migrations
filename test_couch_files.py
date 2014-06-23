@@ -302,8 +302,15 @@ def test_couch_file_migrations():
         full_couch_file_assertions(single_node_db)
 
 
-def full_couch_file_assertions(db):
+def full_couch_file_assertions(db=None):
+    if db is None:
+        version = get_version(couch_host)
+        dbname = "build_full_couch_file_{}".format(version)
+        db = "{0}/{1}".format(couch_host, dbname)
+
     dbname = os.path.basename(db)
+
+    log("Running full couch file assertions on {}".format(db))
 
     # security doc test
     assert(get_sec_doc(db) == sec_doc)
@@ -490,6 +497,9 @@ def build_full_couch_file(copy=True):
     return couch_db
 
 
+def build_and_test():
+    build_full_couch_file()
+    full_couch_file_assertions()
 
 def run_test(name, test):
     log("Running test: {}".format(name))
