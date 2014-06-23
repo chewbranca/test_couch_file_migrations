@@ -307,6 +307,7 @@ def full_couch_file_assertions(db):
 
     # security doc test
     assert(get_sec_doc(db) == sec_doc)
+    passed_test("[{}] security doc test".format(dbname))
 
     # simple doc test
     _status, resp = http('get', db + "/simple_doc", assertion=200)
@@ -314,6 +315,11 @@ def full_couch_file_assertions(db):
     assert(resp["data"] == "minimal")
     assert(rev_num == 1)
     passed_test("[{}] simple doc test".format(dbname))
+
+    # deleted doc test
+    _status, resp = http('get', db + "/deleted_doc", assertion=404)
+    assert(resp == {"error":"not_found","reason":"deleted"})
+    passed_test("[{}] deleted doc test".format(dbname))
 
     # external attachments doc test
     _status, resp = http('get', db + "/external_attachments_doc", assertion=200)
@@ -348,6 +354,20 @@ def full_couch_file_assertions(db):
     assert(len(resp["_revs_info"]) == 1000)
     passed_test("[{}] large num revs doc test".format(dbname))
 
+    # database state tests
+    db_meta_assertions(db)
+    passed_test("[{}] database state test".format(dbname))
+
+
+
+def db_meta_assertions(db):
+    _s, resp = http('get', db, assertion=200)
+    assert(resp['update_seq'] == 1251)
+    assert(resp['doc_count'] == 5)
+    assert(resp['doc_del_count'] == 1)
+    assert(resp['disk_format_version'] == 6)
+    assert(resp['purge_seq'] == 0)
+
 
 def build_full_couch_file(copy=True):
     version = get_version(couch_host)
@@ -366,6 +386,16 @@ def build_full_couch_file(copy=True):
         "data": "minimal"
     }
     http('put', couch_db + "/" + doc["_id"], data=doc, assertion=201)
+
+    # create sample deleted doc
+    doc = {
+        "_id": "deleted_doc",
+        "data": "deleted"
+    }
+    _s, resp = http('put', couch_db + "/" + doc["_id"], data=doc, assertion=201)
+    doc["_rev"] = resp["rev"]
+    doc["_deleted"] = True
+    _s, resp = http('put', couch_db + "/" + doc["_id"], data=doc, assertion=200)
 
     # create sample doc with external attachments
     doc = {
@@ -427,6 +457,9 @@ def build_full_couch_file(copy=True):
     status, resp = http('get', doc_url + "?revs_info=true", data=doc, assertion=200)
     assert(len(resp["_revs_info"]) == 1000)
     assert(len(resp["_revs_info"]) < final_rev)
+
+    # database state tests
+    db_meta_assertions(couch_db)
 
     if copy is True:
         host_file, _single_node_file, _clustered_files = get_db_paths(dbname)
