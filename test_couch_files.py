@@ -29,7 +29,7 @@ shard_suffix_arr = [46, 49, 52, 48, 49, 51, 50, 48, 57, 48, 48]
 
 src_dir = "/Users/russell/src"
 couch_db_path = src_dir + "/couchdb/tmp/lib"
-test_couch_files_path = src_dir + "/test_couch_file_migrations_tmp"
+test_couch_files_path = src_dir + "/test_couch_file_migrations"
 
 sec_doc = {
   "admins" : {
