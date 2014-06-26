@@ -35,6 +35,28 @@ Monkey.
 
 # Running the tests
 
-The current script is an ugly hack with hardcoded values for my dev
-box. The main purpose was to push up a set of .couch files. If there's
-interest I can make this more easily usable by other people.
+First get BigCouch running:
+
+```
+$ git clone https://github.com/apache/couchdb.git bigcouch
+$ cd bigcouch
+$ git checkout -b 1843-feature-bigcouch origin/1843-feature-bigcouch
+$ ./configure && make && ./dev/run
+```
+
+In another terminal grap this repo and run the tests. This will take a
+minute to clone, as this repo is heavy with binary .couch files.
+
+```
+$ git clone https://github.com/chewbranca/test_couch_file_migrations.git
+$ cd test_couch_file_migrations
+$ export BIGCOUCH_PATH=/Users/russell/src/bigcouch # your path here
+$ export BIGCOUCH=http://localhost:15986
+$ for f in $(ls *.couch); do
+    d=${f%.couch};
+    echo "Testing CouchDB version: $d";
+    curl -X DELETE $BIGCOUCH/$d;
+    cp $f $BIGCOUCH_PATH/dev/lib/node1/data/$f;
+    python test_couch_files.py test_full_db_cycle $BIGCOUCH/$d
+done
+```
