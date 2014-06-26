@@ -544,25 +544,28 @@ def build_and_store():
     copy_db(dbname)
 
 
-def run_test(name, test):
+def run_test(name, test, args=[]):
     log("Running test: {}".format(name))
-    test()
+    resp = test(*args)
+    if resp is not None:
+        print "Result: {}".format(resp)
 
 
-def main(test=None):
-    disable_delayed_commits()
+def main(test=None, args=[]):
+    # disable_delayed_commits()
 
     print "Running tests({})".format(test)
     if test is None:
         attrs = inspect.getmembers(sys.modules[__name__])
-        [run_test(n, t) for n, t in attrs if "test_" == n[0:5]]
+        [run_test(n, t, args) for n, t in attrs if "test_" == n[0:5]]
     else:
         func = getattr(sys.modules[__name__], test)
-        run_test(test, func)
+        run_test(test, func, args)
 
 
 if __name__ == "__main__":
-    if len(sys.argv) == 2:
-        main(sys.argv[1])
+    if len(sys.argv) >= 2:
+        main(sys.argv[1], sys.argv[2:])
     else:
-        main()
+        sys.exit(1)
+        # main()
