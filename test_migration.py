@@ -143,7 +143,7 @@ def full_couch_file_assertions(db):
     rev_num = doc_rev_num(resp)
     assert(resp["data"] == "with inline attachment")
     assert(rev_num == 1)
-    assert(resp2 == "Exciting inline attachment text")
+    assert(resp2.decode() == "Exciting inline attachment text")
     passed_test("[{}] inline attachments doc test".format(dbname))
 
     # doc with num revs < revs_limit test
