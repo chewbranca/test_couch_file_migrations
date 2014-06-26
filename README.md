@@ -57,6 +57,6 @@ $ for f in $(ls *.couch); do
     echo "Testing CouchDB version: $d";
     curl -X DELETE $BIGCOUCH/$d;
     cp $f $BIGCOUCH_PATH/dev/lib/node1/data/$f;
-    python test_couch_files.py test_full_db_cycle $BIGCOUCH/$d
+    python test_migration.py $BIGCOUCH/$d
 done
 ```
