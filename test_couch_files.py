@@ -297,9 +297,13 @@ def copy_and_test(dbname):
     _host_db, single_node_db, _clustered_db = get_db_urls(dbname)
     http('delete', single_node_db)
     copy_file(src_file, single_node_file)
-    full_couch_file_assertions(single_node_db)
-    compact_and_test(single_node_db)
-    full_couch_file_assertions(single_node_db)
+    test_full_db_cycle(single_node_db)
+
+
+def test_full_db_cycle(db):
+    full_couch_file_assertions(db)
+    compact_and_test(db)
+    full_couch_file_assertions(db)
 
 
 def test_couch_file_migrations():
