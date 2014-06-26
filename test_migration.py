@@ -65,7 +65,7 @@ def func_to_db():
 
 def passed_test(name=None):
     if name is None:
-        name = funct_to_db()
+        name = func_to_db()
     log("{0} passed".format(name))
 
 
@@ -102,12 +102,7 @@ def test_full_db_cycle(db):
     full_couch_file_assertions(db)
 
 
-def full_couch_file_assertions(db=None):
-    if db is None:
-        version = get_version(couch_host)
-        dbname = "build_full_couch_file_{}".format(version)
-        db = "{0}/{1}".format(couch_host, dbname)
-
+def full_couch_file_assertions(db):
     dbname = os.path.basename(db)
 
     log("Running full couch file assertions on {}".format(db))
